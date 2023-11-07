@@ -1,28 +1,52 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "menger.h"
 
 /**
- * main - Entry point
- *
- * @ac: Arguments counter
- * @av: Arguments vector
- *
- * Return: EXIT_SUCCESS or EXIT_FAILURE
+ * filled - Verifies if a pixel have to be printed
+ * @col: column
+ * @row: row
+ * Return: 1 if filled, otherwise 0
  */
-int main(int ac, char **av)
+
+int filled(int col, int row)
 {
-    int level;
-
-    if (ac < 2)
+    while (col > 0 || row > 0)
     {
-        fprintf(stderr, "Usage: %s level\n", av[0]);
-        return (EXIT_FAILURE);
+        if ((col % 3 == 1) && (row % 3 == 1))
+            return (0);
+        col = col / 3;
+        row = row / 3;
     }
+    return (1);
+}
 
-    level = atoi(av[1]);
-    menger(level);
+/**
+ * return_ - Suplementary return selector
+ * @level:  level
+ * Return:  0
+ */
+int return_(int level)
+{
+    if (level == -1)
+        printf("#\n");
+    return (0);
+}
 
-    return (EXIT_SUCCESS);
+/**
+ * menger - Software that prints a 2D-menger sponge
+ * @level:  Levels to be printed of the 2D-menger sponge
+ * Return:  Nothing
+ */
+void menger(int level)
+{
+    int floor, col, row;
+
+    level == 0 ? return_(-1) : return_(0);
+
+    floor = pow(3, level);
+    for (col = 0; col < floor && level > 0; col++)
+    {
+        for (row = 0; row < floor; row++)
+            filled(col, row) ? printf("%c", '#') : printf("%c", ' ');
+        printf("\n");
+    }
 }
