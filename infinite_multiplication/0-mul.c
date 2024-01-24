@@ -1,93 +1,196 @@
 #include "holberton.h"
-#include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
 
-/**
- * print_num - prints an array of integers like a number
- * @nums3: array of integers
- * @size: size of the array of integers
- */
-void print_num(int *nums3, int size)
-{
-	int i = 0;
+#define true 1
+#define false 0
+#define user_input_error 98
 
-	if (!nums3 && !size)
+#define char_to_digit(x) (x - '0')
+#define mul_chars(a, b) (char_to_digit(a) * char_to_digit(b))
+#define add_chars(a, b) (char_to_digit(a) + char_to_digit(b))
+#define isdigit(x) ((x) >= '0' && (x) <= '9')
+
+/**
+ * main - entry point for mul program
+ * @argc: argument count
+ * @argv: argument array
+ * Return: 98 on user input error | 0 on success
+ */
+int main(int argc, char *argv[])
+{
+	char *result;
+
+	if (argc != 3 || valid_inputs(argv[1], argv[2]) == false)
 	{
-		printf("0\n");
-		exit(0);
+		_puts("Error");
+		exit(user_input_error);
 	}
-	while (nums3[i] == 0)
-		i++;
-	for (; i < size; i++)
-	{
-		printf("%d", nums3[i]);
-	}
-	printf("\n");
+
+	result = infinite_multiply(argv[1], argv[2]);
+	_puts(skip_leading_zeroes(result));
+	free(result);
+	exit(EXIT_SUCCESS);
 }
 
 /**
- * multiply - multiplies two large numbers
- * @nums1: string representation of large int
- * @nums2: string representation of large int
- * Return: 1 on success, 0 on failure
+ * valid_inputs - ensures the two strings are composed of digits only
+ *
+ * @n1: first number (as a string)
+ * @n2: second number (as a string)
+ * Return: true if valid inputs | false otherwise
  */
-int multiply(char *nums1, char *nums2)
+int valid_inputs(char *n1, char *n2)
 {
-	int i, j;
-	int len1, len2, sum, n1, n2 = 0;
-	int *nums3;
+	for (; *n1; n1++)
+		if (!isdigit(*n1))
+			return (false);
 
-	len1 = strlen(nums1);
-	len2 = strlen(nums2);
+	for (; *n2; n2++)
+		if (!isdigit(*n2))
+			return (false);
 
-	nums3 = calloc(len1 + len2, sizeof(len1 + len2));
-	if (!nums3)
+	return (true);
+}
+
+/**
+ * _puts - custom puts
+ * @str: string
+ * Return: number of characters printed
+ */
+int _puts(char *str)
+{
+	size_t i, len = _strlen(str);
+
+	for (i = 0; i < len; i++)
+		_putchar(str[i]);
+	_putchar('\n');
+	return (i + 1);
+}
+
+/**
+ * infinite_multiply - multiplies two numbers (represented as strings)
+ *
+ * @n1: first number
+ * @n2: second number
+ * Return: result of multiplication (as a string). MUST BE FREED
+ */
+char *infinite_multiply(char *n1, char *n2)
+{
+	size_t i, j, n1_size = _strlen(n1), n2_size = _strlen(n2);
+	char *buf = _calloc(n1_size + n2_size, sizeof(char));
+	int product, digit, carry;
+
+	/* reverse digits -- makes things easier to work with */
+	rev_string(n1);
+	rev_string(n2);
+
+	for (i = 0; i < n1_size; i++)
+	{
+		for (carry = 0, j = 0; j < n2_size; j++)
+		{
+			product = mul_chars(n1[i], n2[j]) + carry;
+			digit = product % 10;
+			carry = product / 10;
+			add_digit(buf + i + j, digit);
+		}
+
+		if (carry)
+			add_digit(buf + i + j, carry);
+	}
+
+	/* reverse buffer -- and voilà ! you have the result */
+	rev_string(buf);
+	return (buf);
+}
+
+/**
+ * _strlen - custom strlen
+ *
+ * @str: string
+ * Return: length of string
+ */
+size_t _strlen(char *str)
+{
+	size_t len;
+
+	if (!str)
 		return (0);
 
-	for (i = len1 - 1; i >= 0; i--)
-	{
-		n1 = nums1[i] - '0';
-		for (j = len2 - 1; j >= 0; j--)
-		{
-			n2 = nums2[j] - '0';
-			sum = (n1 * n2) + nums3[i + j + 1];
-			nums3[i + j] += sum / 10;
-			nums3[i + j + 1] = sum % 10;
-		}
-	}
-	print_num(nums3, len1 + len2);
-	free(nums3);
-	return (1);
+	for (len = 0; str[len]; len++)
+		;
+
+	return (len);
 }
 
 /**
- * main - Entry point: multiplies two positive numbers
- * @argc: number of arguments passed
- * @argv: arguments passed (integers)
- * Return: 0 in success, 1 on failure
+ * _calloc - custom calloc
+ *
+ * @nmemb: number of members
+ * @size: size of each member
+ * Return: pointer to allocated space
  */
-int main(int argc, char **argv)
+void *_calloc(size_t nmemb, size_t size)
 {
-	int i, j = 0;
+	char *buf = malloc(nmemb * size);
+	size_t i;
 
-	if (argc != 3)
+	if (buf == NULL)
+		return (NULL);
+
+	for (i = 0; i < nmemb * size; i++)
+		buf[i] = 0;
+
+	return ((void *)buf);
+}
+
+/**
+ * rev_string - reverses a string
+ * @str: string
+ */
+void rev_string(char *str)
+{
+	size_t i, j;
+	char tmp;
+
+	for (i = 0, j = _strlen(str) - 1; i < j; i++, j--)
 	{
-		printf("Error\n");
-		exit(98);
+		tmp = str[i];
+		str[i] = str[j];
+		str[j] = tmp;
 	}
-	for (i = 1; argv[i]; i++)
-		for (j = 0; argv[i][j]; j++)
-			if (argv[i][j] < '0' || argv[i][j] > '9')
-			{
-				printf("Error\n");
-				exit(98);
+}
+/**
+ * add_digit - adds a digit to a char *buffer representing a number, reversed
+ *
+ * @buf: buffer
+ * @digit: digit to add
+ */
+void add_digit(char *buf, int digit)
+{
+	int result;
 
-			}
+	for (; true; buf++)
+	{
+		if (*buf)
+			result = char_to_digit(*buf) + digit;
+		else
+			result = digit;
+		*buf = (result % 10) + '0';
+		digit = result / 10;
+		if (digit == 0)
+			break;
+	}
+}
 
-	if (*argv[1] == '0' || *argv[2] == '0')
-		print_num(NULL, 0);
-	if (!multiply(argv[1], argv[2]))
-		return (1);
-	return (0);
+/**
+ * skip_leading_zeroes - skip leading zeroes in a string
+ * @str: string
+ * Return: string after all leading zeroes
+ */
+char *skip_leading_zeroes(char *str)
+{
+	while (*(str + 1) && *str == '0')
+		str++;
+
+	return (str);
 }

@@ -1,12 +1,24 @@
-#ifndef _HOLBERTON_H_
-#define _HOLBERTON_H_
+#ifndef HOLBERTON_H
+#define HOLBERTON_H
 
-#include <stdlib.h>
+
+typedef unsigned long int size_t;
 
 int _putchar(char c);
-void printer(char *str, int len);
-char is_digit(char *str);
-int _strlen(char *str);
-int multiplication(char *num1, char *num2);
+char *infinite_multiply(char *n1, char *n2);
+void rev_string(char *str);
+void add_digit(char *buf, int digit);
+void *_calloc(size_t nmemb, size_t size);
+size_t _strlen(char *str);
+int valid_inputs(char *n1, char *n2);
+char *skip_leading_zeroes(char *str);
+int _puts(char *str);
 
-#endif /* _HOLBERTON_H_ */
+
+
+
+
+
+
+
+#endif /* HOLBERTON_H */
