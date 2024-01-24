@@ -1,9 +1,12 @@
-#ifndef INF_MULT
-#define INF_MULT
+#ifndef _HOLBERTON_H_
+#define _HOLBERTON_H_
 
-#include <stdio.h>
 #include <stdlib.h>
 
 int _putchar(char c);
+void printer(char *str, int len);
+char is_digit(char *str);
+int _strlen(char *str);
+int multiplication(char *num1, char *num2);
 
-#endif
+#endif /* _HOLBERTON_H_ */
