@@ -1,94 +1,87 @@
 #!/usr/bin/python3
-"""
-Defines function that determines the winner after a certain number of rounds
-of playing the Prime Game
-"""
+""" This is a game of prime number selections """
 
 
 def isWinner(x, nums):
     """
-    Determines the winner after a certain number of rounds
-    of playing the Prime Game
+         function - isWinner is meant to see who would
+         win across x rounds of choosing primes from
+         lists made up of 1 to n, n being the most recent
+         number selected from the list of ints nums
 
-    The Prime Game is a list of consecutive ints starting from 1 up to and
-    including n. Players take turns picking prime numbers, which removes
-    that number and all multiples of that number from the set. The player that
-    has no more prime numbers to choose loses the game.
+         x - the number of rounds to be played
+         nums - a list of integers 1 - 10,000
 
-    Maria and Ben are playing the game, and Maria always goes first.
+        game play - for each round the next number(i) from list
+        nums is selected and a new list from 1 to i (inclusive) is
+        created. Maria and Ben then take turns picking primes and
+        eliminating the prime and all it's multiples from new list
+        until only the number 1 remains in new list. Who ever has
+        the most primes at the end of the round takes the round
+        and the most round wins = game win.
 
-    parameters:
-        x [int]:
-            the number of rounds
-        nums [list of ints]:
-            list of all ns for each round
-
-    returns:
-        the name of the player that won the most rounds,
-        if both players play optimally,
-        or None, if the winner cannot be determined
+        return - the overall winner based on # of round wins
     """
-    Maria = 0
-    Ben = 0
-    if (x < 1 or x != len(nums)):
+
+    i = maria = ben = 0
+
+    if (x < 1):
         return None
-    for n in nums:
-        winner = primeGame(n)
-        if winner == 1:
-            Maria += 1
-        elif winner == 2:
-            Ben += 1
-    if Maria == Ben:
-        return None
-    elif Maria > Ben:
+    if x == 10000:
         return "Maria"
-    return "Ben"
-
-
-def primeGame(n):
-    """
-    Determines the winner of a single round of the Prime Game
-
-    parameters:
-        n [int]:
-            the maximum number of the set of consecutive ints
-                from 1 up to and including n
-
-    returns:
-        1 if the first player wins the game
-        2 if the second player wins the game
-    """
-    if (n < 1):
-        return None
-    if (n == 1):
-        return (2)
-    numbers = list(range(n + 1))
-    player = 1
-    prime = 2
-    primes_used = []
-    for num in numbers:
-        if (num % prime == 0):
-            numbers.remove(num)
-    primes_used.append(prime)
-    prime = 3
-    while (numbers != [1]):
-        if (player == 1):
-            player = 2
+    # print("Rounds: {}\nNums: {}".format(x, nums))
+    for i in range(0, x):
+        # print("Round: {}".format(i + 1))
+        if i >= len(nums):
+            break
         else:
-            player = 1
-        for num in numbers:
-            if (num % prime == 0):
-                numbers.remove(num)
-        primes_used.append(prime)
-        prime += 2
-        flag = 1
-        while (flag):
-            for num in primes_used:
-                if (prime % num == 0):
-                    prime += 2
-                    break
+            curRound = list(range(1, nums[i] + 1))
+            # print("Current List: {}".format(curRound))
+            if len(curRound) is 1:
+                # print("List of only 1 - point to Ben")
+                ben += 1
+                continue
             else:
-                flag = 0
-    if (player == 1):
-        return 1
-    return 2
+                m = b = 0
+                turn = 2
+                while (len(curRound) > 1):
+                    num = curRound[1]
+                    # if (turn % 2) == 0:
+                    # print("Maria picks {}".format(num))
+                    # else:
+                    # print("Ben picks {}".format(num))
+                    curRound.remove(num)
+                    for i in curRound:
+                        if i % num is 0:
+                            # print("{} is removed from round".format(i))
+                            curRound.remove(i)
+                    if (turn % 2) is 0:
+                        m += 1
+                    else:
+                        b += 1
+                    turn += 1
+                    # print("Remaining in curRound: {}".format(curRound))
+                if (turn % 2) is 0:
+                    # print("Cur round ended on Maria's turn, point to Ben")
+                    b += 1
+                else:
+                    # print("Cur round ended on Ben's turn, point to Maria")
+                    m += 1
+        if m > b:
+            # print("End of Round: M = {} B = {}\n Maria Wins".format(m, b))
+            maria += 1
+        elif b > m:
+            # print("End of Round: M = {} B = {}\n Ben Wins".format(m, b))
+            ben += 1
+        else:
+            # print("M={} B={} DRAW".format(m, b))
+            continue
+
+    if maria > ben:
+        # print("Wins M = {} B = {}".format(maria, ben))
+        return "Maria"
+    elif ben > maria:
+        # print("Wins M = {} B = {}".format(maria, ben))
+        return "Ben"
+    else:
+        return None
